@@ -1,6 +1,6 @@
-export namespace main {
+export namespace update {
 	
-	export class UpdateInfo {
+	export class Info {
 	    available: boolean;
 	    version: string;
 	    downloadUrl: string;
@@ -8,7 +8,7 @@ export namespace main {
 	    error?: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new UpdateInfo(source);
+	        return new Info(source);
 	    }
 	
 	    constructor(source: any = {}) {

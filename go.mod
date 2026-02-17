@@ -1,6 +1,6 @@
 module JustServe
 
-go 1.23
+go 1.26
 
 require (
 	github.com/minio/selfupdate v0.6.0
