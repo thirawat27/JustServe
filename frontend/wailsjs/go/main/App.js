@@ -18,6 +18,10 @@ export function GetLocalIPs() {
   return window['go']['main']['App']['GetLocalIPs']();
 }
 
+export function GetAppVersion() {
+  return window['go']['main']['App']['GetAppVersion']();
+}
+
 export function GetP2PStatus() {
   return window['go']['main']['App']['GetP2PStatus']();
 }

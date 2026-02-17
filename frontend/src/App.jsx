@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import './style.css';
-import { SelectFolder, SelectFile, StartLocalServer, StartPublicServer, StopServer, GetLocalIPs, StartProxy, OpenInExplorer, StartP2PSend, StopP2PTransfer, ConnectP2P, DiscoverP2PPeers, GetP2PStatus, CheckUpdate, InstallUpdate } from '../wailsjs/go/main/App';
+import { SelectFolder, SelectFile, StartLocalServer, StartPublicServer, StopServer, GetLocalIPs, StartProxy, OpenInExplorer, StartP2PSend, StopP2PTransfer, ConnectP2P, DiscoverP2PPeers, GetP2PStatus, CheckUpdate, InstallUpdate, GetAppVersion } from '../wailsjs/go/main/App';
 import * as runtime from '../wailsjs/runtime/runtime';
 import QRCode from 'react-qr-code';
 import {
@@ -352,6 +352,7 @@ const AppContent = () => {
 
     // Update State
     const [updateInfo, setUpdateInfo] = useState(null);
+    const [appVersion, setAppVersion] = useState("...");
 
     // Hover/Anim states
     const [isHoveringStart, setIsHoveringStart] = useState(false);
@@ -407,6 +408,7 @@ const AppContent = () => {
 
     useEffect(() => {
         checkForUpdates();
+        GetAppVersion().then(v => setAppVersion(v)).catch(err => console.error("Failed to get version:", err));
     }, []);
 
     const log = (type, message) => {
@@ -1488,7 +1490,7 @@ const AppContent = () => {
                                                         {updateInfo?.available ? `${t('update_available')} ${updateInfo.version}` : t('up_to_date')}
                                                     </div>
                                                     <div className="text-xs text-[var(--text-secondary)]">
-                                                        {t('current_version')}: 1.0.1
+                                                        {t('current_version')}: {appVersion}
                                                     </div>
                                                 </div>
                                             </div>
@@ -1509,7 +1511,7 @@ const AppContent = () => {
                                     <div className="flex items-center justify-between">
                                         <Logo className="scale-110" />
                                         <div className="text-right">
-                                            <p className="text-sm text-[var(--text-secondary)]">{t('version')} 1.0.1</p>
+                                            <p className="text-sm text-[var(--text-secondary)]">{t('version')} {appVersion}</p>
                                         </div>
                                     </div>
                                 </section>
@@ -1519,7 +1521,7 @@ const AppContent = () => {
                         {activeTab === 'about' && (
                             <div className="flex flex-col items-center justify-center py-10 text-center">
                                 <Logo className="scale-150 mb-6" />
-                                <p className="text-[var(--text-secondary)] mb-8">{t('version')} 1.0.1</p>
+                                <p className="text-[var(--text-secondary)] mb-8">{t('version')} {appVersion}</p>
                                 <p className="max-w-md text-[var(--text-secondary)] text-sm mb-6">
                                     {t('about_text')}
                                 </p>

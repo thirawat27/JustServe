@@ -216,6 +216,11 @@ func (a *App) InstallUpdate(url string) (string, error) {
 	return update.InstallUpdate(url)
 }
 
+// GetAppVersion returns the current application version
+func (a *App) GetAppVersion() string {
+	return update.CurrentVersion
+}
+
 // StartProxy exposes a local port via Ngrok (HTTP) or net.Listen (TCP)
 func (a *App) StartProxy(token string, port string, protocol string) (string, error) {
 	a.mu.Lock()
