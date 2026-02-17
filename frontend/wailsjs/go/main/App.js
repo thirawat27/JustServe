@@ -14,12 +14,12 @@ export function DiscoverP2PPeers(arg1) {
   return window['go']['main']['App']['DiscoverP2PPeers'](arg1);
 }
 
-export function GetLocalIPs() {
-  return window['go']['main']['App']['GetLocalIPs']();
-}
-
 export function GetAppVersion() {
   return window['go']['main']['App']['GetAppVersion']();
+}
+
+export function GetLocalIPs() {
+  return window['go']['main']['App']['GetLocalIPs']();
 }
 
 export function GetP2PStatus() {
