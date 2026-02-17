@@ -3,11 +3,13 @@ module JustServe
 go 1.23
 
 require (
+	github.com/minio/selfupdate v0.6.0
 	github.com/wailsapp/wails/v2 v2.11.0
 	golang.ngrok.com/ngrok v1.13.0
 )
 
 require (
+	aead.dev/minisign v0.2.0 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect

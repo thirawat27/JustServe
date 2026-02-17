@@ -1,26 +1,25 @@
-# ⚡ JustServe
-> **The instant, zero-configuration file server for everyone.**
+# JustServe 🚀
+> **Universal Localhost Exposer & File Server**  
+> Instantly share files or expose local services (Minecraft, Web Apps) to the world.
 
 [![Go](https://img.shields.io/badge/Backend-Go-blue.svg)](https://golang.org/)
 [![React](https://img.shields.io/badge/Frontend-React-61DAFB.svg)](https://reactjs.org/)
 [![Wails](https://img.shields.io/badge/Powered%20by-Wails-red.svg)](https://wails.io/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)]()
-[![Build Status](https://img.shields.io/github/actions/workflow/status/Thirawat27/JustServe/release.yml)](https://github.com/Thirawat27/JustServe/actions)
-[![Latest Release](https://img.shields.io/github/v/release/Thirawat27/JustServe)](https://github.com/Thirawat27/JustServe/releases)
 
-JustServe transforms your computer into a powerful, instant file server. Share files, host static sites, or receive uploads from anyone, anywhere—whether they're on your local Wi-Fi or across the globe. No command line required.
+JustServe is a versatile, all-in-one tool designed for developers and gamers. Whether you need to quickly share a file, host a static website, or open a tunnel to your local Minecraft server, JustServe handles it with a beautiful "Cosmic Glass" interface.
 
 ---
 
-### ✨ Key Features
+## ✨ Key Features
 
-*   **⚡ Instant Local Sharing**: Host files on your Local Area Network (LAN) with one click. Ideal for transferring photos to your phone without cables.
-*   **🌍 World-Wide Access**: Built-in **Ngrok Tunneling** creates a secure, public HTTPS URL instantly. Share files with friends anywhere in the world.
-*   **🔒 Secure & Private**: Optional **Password Protection** ensures only authorized users can access your files.
-*   **📤 Two-Way Transfer**: Enable **Upload Mode** to let others send files directly to your computer.
-*   **📱 QR Code Integration**: Scan to connect. No need to type lengthy IP addresses or URLs.
-*   **🎨 Stunning UI**: A modern, "Cosmic Glass" aesthetic designed for clarity and ease of use.
-*   **🚀 High Performance**: Built with **Go** for blazing-fast file serving and low resource usage.
+- **📂 Instant File Sharing**: Serve directories or single files over HTTP.
+- **🌐 Public Tunneling**: Expose your localhost to the internet via secure Ngrok tunnels.
+- **🔌 Port Forwarding**: Tunnel any TCP/HTTP traffic (e.g., Minecraft, React Apps, C++ Servers).
+- **🔒 Security First**: Optional password protection and granular access control.
+- **⚡ High Performance**: Built with Go for the backend and React for the frontend.
+- **🎨 Modern UI**: Beautiful glassmorphism aesthetic with Dark/Light mode.
+- **🐈‍⬛ CI/CD Automated**: Built-in GitHub Actions for automated releases.
 
 ---
 
@@ -36,7 +35,7 @@ We leverage a modern hybrid stack to deliver a native desktop experience with we
 
 ---
 
-### � Installation
+###  Installation
 
 #### Download Pre-built Binary
 Go to the [Releases Page](https://github.com/Thirawat27/JustServe/releases) and download the version for your OS (Windows, macOS, or Linux).
@@ -85,32 +84,7 @@ The executable will be generated in the `build/bin` directory.
 
 ---
 
-### 🤖 CI/CD Automation
-
-This project uses **GitHub Actions** for automated builds and releases.
-*   **Trigger**: Pushing a tag starting with `v` (e.g., `v1.0.0`).
-*   **Action**: Automatically builds binaries for Windows, macOS, and Linux, and publishes them to GitHub Releases.
-
-To create a new release:
-```bash
-git tag v1.0.1
-git push origin v1.0.1
-```
-
----
-
 ### 👨‍💻 Credits
 
 **Created by**: [Thirawat27](https://github.com/Thirawat27)
 **License**: MIT License
-
----
-
-### 🔮 Roadmap
-
-- [x] **v1.0.0**: Initial Release (Local/Public Serving, QR Codes)
-- [x] **v1.1.0**: Password Protection & File Uploads
-- [x] **v1.2.0**: UI Overhaul (Cosmic Glass Theme)
-- [ ] **v1.3.0**: Drag-and-drop file sharing (Single file mode)
-- [ ] **v1.4.0**: Dark/Light mode toggle
-- [ ] **v2.0.0**: P2P Direct Transfer (WebRTC)
