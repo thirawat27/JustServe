@@ -702,22 +702,30 @@ const AppContent = () => {
         </button>
     );
 
-    const ConfigToggle = ({ label, active, onChange, icon: Icon }) => (
-        <div
-            onClick={() => !isServing && onChange(!active)}
-            className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${active
-                ? 'bg-blue-600/5 border-blue-600/30'
-                : 'bg-transparent border-[var(--input-border)] hover:border-[var(--text-secondary)]'} ${isServing ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-            <div className="flex items-center gap-3">
-                <Icon size={18} className={active ? "text-blue-500" : "text-[var(--text-secondary)]"} />
-                <span className={`text-sm font-medium ${active ? 'text-blue-500' : 'text-[var(--text-secondary)]'}`}>{label}</span>
+    const ConfigToggle = ({ label, active, onChange, icon: Icon }) => {
+        const handleClick = () => {
+            if (!isServing) {
+                onChange(!active);
+            }
+        };
+
+        return (
+            <div
+                onClick={handleClick}
+                className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${active
+                    ? 'bg-blue-600/5 border-blue-600/30'
+                    : 'bg-transparent border-[var(--input-border)] hover:border-[var(--text-secondary)]'} ${isServing ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                <div className="flex items-center gap-3">
+                    <Icon size={18} className={active ? "text-blue-500" : "text-[var(--text-secondary)]"} />
+                    <span className={`text-sm font-medium ${active ? 'text-blue-500' : 'text-[var(--text-secondary)]'}`}>{label}</span>
+                </div>
+                <div className={`w-9 h-5 rounded-full relative transition-colors ${active ? 'bg-blue-600' : 'bg-[var(--input-border)]'}`}>
+                    <div className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-white transition-transform ${active ? 'translate-x-4' : 'translate-x-0'}`} />
+                </div>
             </div>
-            <div className={`w-9 h-5 rounded-full relative transition-colors ${active ? 'bg-blue-600' : 'bg-[var(--input-border)]'}`}>
-                <div className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-white transition-transform ${active ? 'translate-x-4' : 'translate-x-0'}`} />
-            </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="flex h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans overflow-hidden">
