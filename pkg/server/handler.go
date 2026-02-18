@@ -9,7 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 	"html/template"
+	"embed"
 )
+
+//go:embed templates/*.html
+var templateFS embed.FS
 
 type FileHandler struct {
 	root        string
@@ -194,72 +198,12 @@ func (h *FileHandler) serveSingleFilePage(w http.ResponseWriter, path string) {
 	}
 
 	// Reusing similar template structure for consistency
-	const tpl = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JustServe - {{.Name}}</title>
-    <style>
-        :root {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --border: #334155;
-        }
-        body { 
-            font-family: 'Inter', -apple-system, sans-serif; 
-            background: var(--bg); 
-            color: var(--text-primary); 
-            margin: 0; 
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .card { 
-            background: var(--card-bg); 
-            padding: 3rem; 
-            border-radius: 24px; 
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); 
-            border: 1px solid var(--border);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-        .icon { font-size: 4rem; margin-bottom: 1.5rem; }
-        h1 { margin: 0 0 0.5rem 0; font-size: 1.5rem; word-break: break-all; }
-        p { color: var(--text-secondary); margin: 0 0 2rem 0; }
-        .btn {
-            background: var(--accent);
-            color: white;
-            text-decoration: none;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            display: inline-block;
-            transition: all 0.2s;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .btn:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3); }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="icon">📄</div>
-        <h1>{{.Name}}</h1>
-        <p>{{.Size}}</p>
-        <a href="{{.Name}}" class="btn" download>Download File</a>
-    </div>
-</body>
-</html>
-`
-	t, _ := template.New("single").Parse(tpl)
+	var t *template.Template
+	var errTmp error
+	if t, errTmp = template.ParseFS(templateFS, "templates/single_file.html"); errTmp != nil {
+		http.Error(w, "Template error: " + errTmp.Error(), http.StatusInternalServerError)
+		return
+	}
 	data := struct {
 		Name string
 		Size string
@@ -355,213 +299,10 @@ func (h *FileHandler) serveDirectory(w http.ResponseWriter, requestPath string, 
 	for _, f := range files { processEntry(f) }
 
 	// HTML Template - Modernized
-	const tpl = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JustServe - {{.Path}}</title>
-    <style>
-        :root {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --border: #334155;
-            --success: #10b981;
-        }
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg); 
-            color: var(--text-primary); 
-            margin: 0; 
-            padding: 20px; 
-            min-height: 100vh;
-        }
-        .container { 
-            max-width: 900px; 
-            margin: 0 auto; 
-            background: var(--card-bg); 
-            padding: 2rem; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3); 
-            border: 1px solid var(--border);
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        h1 { 
-            font-size: 1.25rem; 
-            margin: 0; 
-            font-weight: 600; 
-            color: var(--text-primary); 
-            word-break: break-all;
-        }
-        .path-badge {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent);
-            padding: 0.25rem 0.75rem;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.9em;
-        }
-        .actions {
-            display: flex;
-            gap: 10px;
-        }
-        .btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.2s ease;
-        }
-        .btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
-        .btn-download { background: #0ea5e9; }
-        .btn-download:hover { background: #0284c7; }
-
-        ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
-        li { 
-            padding: 1rem; 
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid transparent;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            transition: all 0.2s;
-        }
-        li:hover { 
-            background: rgba(255, 255, 255, 0.05); 
-            border-color: var(--border);
-            transform: translateX(5px);
-        }
-        .file-info { display: flex; align-items: center; gap: 1rem; flex: 1; min-width: 0; }
-        .file-icon { font-size: 1.5rem; }
-        .file-name { 
-            color: var(--text-primary); 
-            text-decoration: none; 
-            font-weight: 500; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            white-space: nowrap;
-        }
-        .file-name:hover { color: var(--accent); }
-        .file-meta { 
-            color: var(--text-secondary); 
-            font-size: 0.85rem; 
-            font-variant-numeric: tabular-nums;
-            white-space: nowrap;
-            margin-left: 1rem;
-        }
-
-        .upload-section { 
-            margin-top: 2.5rem; 
-            padding-top: 2rem; 
-            border-top: 1px dashed var(--border); 
-        }
-        .upload-area {
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.2s;
-            cursor: pointer;
-            position: relative;
-        }
-        .upload-area:hover { border-color: var(--accent); background: rgba(59, 130, 246, 0.05); }
-        .upload-title { font-weight: 600; margin-bottom: 0.5rem; display: block; }
-        .upload-desc { font-size: 0.85rem; color: var(--text-secondary); }
-        input[type="file"] { 
-            position: absolute; 
-            inset: 0; 
-            opacity: 0; 
-            cursor: pointer; 
-            width: 100%; 
-            height: 100%; 
-        }
-        .upload-btn-submit {
-            margin-top: 1rem;
-            width: 100%;
-            justify-content: center;
-        }
-        @media (max-width: 600px) {
-            .container { padding: 1.5rem; }
-            li { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-            .file-meta { margin-left: auto; width: 100%; text-align: right; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem; }
-            header { flex-direction: column; align-items: flex-start; }
-            .actions { width: 100%; }
-            .btn { flex: 1; justify-content: center; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <div>
-                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Current Directory</div>
-                <h1><span class="path-badge">{{.Path}}</span></h1>
-            </div>
-            <div class="actions">
-                 <a href="?download=zip" class="btn btn-download">
-                    <span>⚡ Download All (.zip)</span>
-                </a>
-            </div>
-        </header>
-
-        <ul>
-            {{range .Files}}
-            <li>
-                <div class="file-info">
-                    <span class="file-icon">{{.Icon}}</span>
-                    <a href="{{.Name}}{{if .IsDir}}/{{end}}" class="file-name">{{.Name}}</a>
-                </div>
-                <div class="file-meta">{{.Size}}</div>
-            </li>
-            {{end}}
-        </ul>
-
-        {{if .AllowUpload}}
-        <div class="upload-section">
-            <form action="{{.Path}}" method="POST" enctype="multipart/form-data">
-                <div class="upload-area">
-                    <span class="upload-title">📤 Upload File</span>
-                    <span class="upload-desc">Drag & drop or click to select a file</span>
-                    <input type="file" name="file" onchange="this.form.submit()" required>
-                </div>
-                <!-- Fallback button if JS doesn't trigger onchange -->
-                <noscript>
-                    <button type="submit" class="btn upload-btn-submit">Upload Selected File</button>
-                </noscript>
-            </form>
-        </div>
-        {{end}}
-    </div>
-</body>
-</html>
-`
-	t, err := template.New("listing").Parse(tpl)
-	if err != nil {
-		http.Error(w, "Template error", http.StatusInternalServerError)
+	var t *template.Template
+	var errTmp error
+	if t, errTmp = template.ParseFS(templateFS, "templates/directory_listing.html"); errTmp != nil {
+		http.Error(w, "Template error: " + errTmp.Error(), http.StatusInternalServerError)
 		return
 	}
 

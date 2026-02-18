@@ -4,14 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
+	stdruntime "runtime"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/minio/selfupdate"
 )
 
 const (
-	CurrentVersion = "1.0.2"
+	CurrentVersion = "1.1.0"
 	RepoOwner      = "thirawat27"
 	RepoName       = "JustServe"
 )
@@ -55,13 +60,52 @@ func CheckUpdate() (*Info, error) {
 	isNewer := compareVersions(release.TagName, CurrentVersion)
 
 	if isNewer {
-		// Find asset for Windows
+		// Determine required suffix based on OS
+		var requiredSuffix string
+		var osKeyword string
+
+		switch stdruntime.GOOS {
+		case "windows":
+			requiredSuffix = ".exe"
+			osKeyword = "windows"
+		case "darwin": // macOS
+			requiredSuffix = "" // Binary usually has no extension or is .app/zip, assuming binary or specific naming
+			osKeyword = "darwin"
+		case "linux":
+			requiredSuffix = ""
+			osKeyword = "linux"
+		default:
+			// Fallback or unhandled OS
+			requiredSuffix = ".exe"
+		}
+
+		// Find asset matching the current OS
 		var downloadURL string
 		for _, asset := range release.Assets {
-			// Basic check for .exe extension for Windows
-			if strings.HasSuffix(strings.ToLower(asset.Name), ".exe") {
-				downloadURL = asset.BrowserDownloadURL
-				break
+			name := strings.ToLower(asset.Name)
+			
+			// Check if asset matches OS keyword (e.g., "JustServe_linux_amd64")
+			// and has the correct extension if required
+			if osKeyword != "" && !strings.Contains(name, osKeyword) {
+				continue
+			}
+
+			if requiredSuffix != "" && !strings.HasSuffix(name, requiredSuffix) {
+				continue
+			}
+
+			// Found a candidate
+			downloadURL = asset.BrowserDownloadURL
+			break
+		}
+		
+		// Fallback: if specific OS asset not found, try finding just by extension for Windows
+		if downloadURL == "" && stdruntime.GOOS == "windows" {
+			for _, asset := range release.Assets {
+				if strings.HasSuffix(strings.ToLower(asset.Name), ".exe") {
+					downloadURL = asset.BrowserDownloadURL
+					break
+				}
 			}
 		}
 
@@ -78,21 +122,54 @@ func CheckUpdate() (*Info, error) {
 	return &Info{Available: false}, nil
 }
 
-// InstallUpdate downloads and applies the update
+// InstallUpdate downloads, applies the update, then relaunches the app automatically
 func InstallUpdate(url string) (string, error) {
+	// Get current executable path before overwriting
+	execPath, err := os.Executable()
+	if err != nil {
+		return "", fmt.Errorf("failed to get executable path: %w", err)
+	}
+	// Resolve symlinks to get the real path
+	execPath, err = filepath.EvalSymlinks(execPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve executable path: %w", err)
+	}
+
+	// Download the new binary
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to download update: %w", err)
 	}
 	defer resp.Body.Close()
 
+	// Apply the update (replaces the running binary on disk)
 	err = selfupdate.Apply(resp.Body, selfupdate.Options{})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to apply update: %w", err)
 	}
 
-	return "Update applied successfully. Please restart the application.", nil
+	// Launch the new version as a detached process
+	cmd := exec.Command(execPath)
+	cmd.Stdout = nil
+	cmd.Stderr = nil
+	cmd.Stdin = nil
+	// SysProcAttr is set per-platform via build tags (see below)
+	setSysProcAttr(cmd)
+
+	if err := cmd.Start(); err != nil {
+		// Update was applied but relaunch failed — user can restart manually
+		return "Update applied. Please restart the application manually.", nil
+	}
+
+	// Exit the current (old) process
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+		os.Exit(0)
+	}()
+
+	return "Update applied! Restarting...", nil
 }
+
 
 // Helper to compare semantic versions v1.0.0 vs 1.0.1
 func compareVersions(newV, oldV string) bool {

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JustServe - {{.Path}}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+        --color-bg-main: #0f172a;
+        --color-bg-card: #1e293b;
+        --color-border: #334155;
+        --color-accent: #3b82f6;
+        --color-success: #10b981;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+      }
+    </style>
+</head>
+
+<body
+    class="bg-bg-main text-slate-100 min-h-screen p-3 md:p-8 font-sans antialiased selection:bg-accent selection:text-white pb-20 md:pb-8">
+
+    <div
+        class="max-w-5xl mx-auto bg-bg-card/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-border overflow-hidden ring-1 ring-white/10">
+
+        <!-- Header Section -->
+        <header
+            class="p-5 md:p-6 border-b border-border bg-bg-card/80 sticky top-0 z-20 backdrop-blur-md transition-all">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="w-full md:w-auto overflow-hidden">
+                    <p
+                        class="text-[0.65rem] text-slate-400 font-mono mb-1 uppercase tracking-widest font-semibold flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                        Current Directory
+                    </p>
+                    <h1 class="text-lg md:text-xl font-bold font-mono text-blue-400 break-all leading-tight truncate"
+                        title="{{.Path}}">
+                        {{.Path}}
+                    </h1>
+                </div>
+
+                <div class="flex gap-2 w-full md:w-auto shrink-0">
+                    {{range .Files}}
+                    {{if eq .Name ".."}}
+                    <a href="{{.Name}}{{if .Params}}{{.Params}}{{end}}"
+                        class="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-700/50 hover:bg-slate-700 text-slate-200 rounded-xl transition-all text-sm font-medium border border-border hover:border-slate-500 active:scale-95 group shadow-sm w-auto md:w-auto">
+                        <span class="group-hover:-translate-x-1 transition-transform">↩</span> Back
+                    </a>
+                    {{end}}
+                    {{end}}
+
+                    <a href="?download=zip"
+                        class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-blue-600 text-white rounded-xl transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 text-sm font-semibold active:scale-95 border border-blue-400/20 whitespace-nowrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download ZIP
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- File List -->
+        <div class="p-2 md:p-4">
+            <ul class="grid grid-cols-1 gap-1">
+                {{range .Files}}
+                {{if ne .Name ".."}}
+                <li>
+                    <a href="{{.Name}}{{if .IsDir}}/{{end}}{{if .Params}}{{.Params}}{{end}}"
+                        class="group flex items-center justify-between p-3 md:p-4 rounded-xl hover:bg-slate-700/40 border border-transparent hover:border-border transition-all cursor-pointer active:bg-slate-700/60">
+                        <div class="flex items-center gap-4 min-w-0 flex-1">
+                            <span
+                                class="text-3xl md:text-2xl filter drop-shadow opacity-90 group-hover:scale-110 transition-transform duration-300">
+                                {{.Icon}}
+                            </span>
+                            <div class="flex flex-col min-w-0">
+                                <span
+                                    class="font-medium text-slate-200 truncate group-hover:text-blue-400 transition-colors text-base md:text-sm">
+                                    {{.Name}}
+                                </span>
+                                <span class="text-xs text-slate-500 md:hidden mt-0.5">
+                                    {{.Size}}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Desktop Size Badge -->
+                        <div class="hidden md:block">
+                            <span
+                                class="text-xs font-mono text-slate-500 bg-slate-800/50 px-2 py-1 rounded border border-slate-700/50 group-hover:border-slate-600/50 group-hover:text-slate-400 transition-colors">
+                                {{.Size}}
+                            </span>
+                        </div>
+
+                        <!-- Mobile Chevron -->
+                        <div class="md:hidden text-slate-600 group-hover:text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </a>
+                </li>
+                {{end}}
+                {{end}}
+            </ul>
+
+            <!-- Empty State check (simple logic if no files) -->
+            {{if eq (len .Files) 1}}
+            <!-- Assuming only '..' is present, or really empty if list is 0 but back button Logic might add one -->
+            <div class="text-center py-12 text-slate-500">
+                <div class="text-4xl mb-3 opacity-50">📂</div>
+                <p>This folder is empty</p>
+            </div>
+            {{end}}
+        </div>
+
+        <!-- Update Section -->
+        {{if .AllowUpload}}
+        <div class="p-4 md:p-6 border-t border-border bg-bg-card/30 backdrop-blur-sm">
+            <form action="{{.Path}}" method="POST" enctype="multipart/form-data" class="relative group">
+                <div
+                    class="border-2 border-dashed border-slate-600/50 rounded-xl p-6 md:p-8 text-center transition-all duration-300 group-hover:border-accent group-hover:bg-accent/5 cursor-pointer relative overflow-hidden">
+                    <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
+                        onchange="this.form.submit()" required>
+
+                    <div class="pointer-events-none transform transition-transform group-hover:scale-105 duration-300">
+                        <div class="mb-3 text-4xl opacity-60 group-hover:opacity-100 transition-opacity drop-shadow-lg">
+                            📤</div>
+                        <h3 class="font-bold text-slate-200 mb-1 group-hover:text-accent transition-colors">Upload File
+                        </h3>
+                        <p class="text-xs md:text-sm text-slate-400 group-hover:text-blue-300/80 transition-colors">Drag
+                            & drop or tap to browse</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {{end}}
+
+        <!-- Footer -->
+        <footer class="p-4 text-center text-[10px] md:text-xs text-slate-600 border-t border-border/50 bg-bg-main/50">
+            Powered by <span class="text-slate-500 font-semibold">JustServe</span> • Secure Local File Sharing
+        </footer>
+    </div>
+</body>
+
+</html>

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+
 	"encoding/binary"
 	"fmt"
 	"image/png"

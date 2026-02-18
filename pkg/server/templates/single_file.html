@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JustServe - {{.Name}}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+        --color-bg: #0f172a;
+        --color-card: #1e293b;
+        --color-accent: #3b82f6;
+        --color-accent-hover: #2563eb;
+      }
+    </style>
+</head>
+
+<body class="bg-bg text-white min-h-screen flex items-center justify-center p-4 antialiased">
+    <div
+        class="bg-card p-8 rounded-2xl shadow-2xl border border-slate-700 w-full max-w-md text-center relative overflow-hidden transition-all duration-300 transform hover:shadow-blue-900/10">
+        <div class="pointer-events-none absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500">
+        </div>
+
+        <div
+            class="text-7xl mb-6 transform hover:scale-110 transition-transform duration-300 select-none cursor-default">
+            📄</div>
+
+        <h1 class="text-xl md:text-2xl font-bold mb-3 break-all text-white leading-tight tracking-tight px-2">{{.Name}}
+        </h1>
+        <p
+            class="text-slate-400 mb-8 font-mono text-sm tracking-wide bg-slate-800/50 inline-block px-3 py-1 rounded-full border border-slate-700/50">
+            {{.Size}}</p>
+
+        <a href="{{.Name}}" download
+            class="block w-full py-4 px-6 bg-accent hover:bg-accent-hover text-white rounded-xl font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all transform hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer text-lg">
+            Download File
+        </a>
+
+        <div class="mt-6 text-xs text-slate-500 font-mono">
+            Powered by JustServe
+        </div>
+    </div>
+</body>
+
+</html>
