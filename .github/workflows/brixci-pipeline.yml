@@ -1,0 +1,16 @@
+name: BrixCI Pipeline
+'on':
+  push:
+    branches:
+      - main
+jobs:
+  build_test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Dependencies
+        run: npm ci
+      - name: New Step
+        uses: actions/checkout@v4
